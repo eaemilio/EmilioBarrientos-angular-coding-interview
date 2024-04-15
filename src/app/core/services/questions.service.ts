@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { QuestionModel } from '../state/question.model';
 import { QuestionsStore } from '../state/questions.store';
-import { map, pluck, tap } from 'rxjs/operators';
+import { catchError, map, pluck, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +17,7 @@ export class QuestionsService {
     private readonly store: QuestionsStore,
   ) { }
 
-  getQuestions(params: { [x: string]: any, amount: string, type?: string, difficulty?: string }): Observable<QuestionModel[]> {
+  getQuestions(params: { [x: string]: any, amount: string, type?: string, difficulty?: string }): Observable<QuestionModel[] | { error: string }> {
     Object.keys(params).forEach((key: string) => typeof params[key] === 'undefined' && delete params[key]);
     this.store.update(state => ({
       ...state,
@@ -38,23 +38,24 @@ export class QuestionsService {
             text: result.correct_answer,
             isCorrect: true,
           },
-            ...result.incorrect_answers.map((answer: any) => ({
-              _id: new Date().getTime().toString() + Math.random(),
-              text: answer,
-              isCorrect: false,
-            }))
-          ].sort(() => .5 - Math.random()), // We know this isn't the best shuffle but it's just a simple one for this challenge
-        }));
-      }))
-      .pipe(tap((questions) => {
-        this.store.set(questions);
-        this.store.update(state => ({
-          ...state,
-          gettingQuestions: false,
-        }));
+          ...result.incorrect_answers.map((answer: any) => ({
+            _id: new Date().getTime().toString() + Math.random(),
+            text: answer,
+            isCorrect: false,
+          }))
+        ].sort(() => .5 - Math.random()), // We know this isn't the best shuffle but it's just a simple one for this challenge
       }));
+    }))
+    .pipe(tap((questions) => {
+      this.store.set(questions);
+      this.store.update(state => ({
+        ...state,
+        gettingQuestions: false,
+      }));
+    }))
+    .pipe(catchError(() => throwError(new Error('Error loading data'))));
   }
-
+  
   selectAnswer(questionId: QuestionModel['_id'], answerId: string): void {
     this.store.upsert(questionId, entity => ({
       ...entity,
