@@ -1,0 +1,32 @@
+<section class="w-full flex justify-center px-6 flex-col items-center">
+  <h1 *ngIf="gettingQuestions$ | async; else questions">Loading...</h1>
+
+  <ng-template #questions>
+    <div *ngFor="let question of questions$ | async; let i = index"
+         class="w-full md:w-7/12 lg:w-5/12 xl:w-4/12 bg-off-white flex flex-col px-4 py-6 rounded-xl shadow mb-4">
+
+      <div class="w-full mb-4">
+        <h2 class="text-md font-bold">Question #{{ i + 1 }}:</h2>
+
+        <p>
+          {{ question.question }}
+        </p>
+      </div>
+
+      <div class="w-full">
+        <h2 class="font-bold mb-4">Options:</h2>
+
+        <div class="w-full flex flex-wrap content-center justify-center">
+          <div *ngFor="let answer of question.answers" class="w-6/12 px-4">
+            <button (click)="onAnswerClicked(question._id, answer._id)"
+                    [class.bg-primary-default]="answer._id !== question.selectedId"
+                    [class.bg-secondary-default]="answer._id === question.selectedId"
+                    class="text-off-white rounded-xl w-full p-4 mb-4">
+              {{ answer.text }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</section>

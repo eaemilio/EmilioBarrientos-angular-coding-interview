@@ -1,0 +1,49 @@
+<section class="w-full flex justify-center px-6">
+  <div class="w-full md:w-6/12 lg:w-4/12 xl:w-3/12 bg-off-white flex flex-col px-4 py-6 rounded-xl shadow">
+    <div class="w-full text-center mb-14">
+      <h2 class="text-4xl font-bold">New game</h2>
+    </div>
+
+    <form [formGroup]="form" class="w-full flex flex-col mb-8">
+      <div class="w-full mb-4">
+        <label for="amount">
+          Quantity of questions
+          <input id="amount" type="number" class="w-full rounded-xl" formControlName="amount">
+        </label>
+      </div>
+
+      <div class="w-full mb-4">
+        <label for="difficulty">
+          Difficulty
+          <select name="difficulty" id="difficulty" class="w-full rounded-xl" formControlName="difficulty">
+            <option value="">All</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="w-full">
+        <label for="type">
+          Type of questions
+          <select name="type" id="type" class="w-full rounded-xl" formControlName="type">
+            <option value="">All</option>
+            <option value="multiple">Multiple choices</option>
+            <option value="boolean">True / False</option>
+          </select>
+        </label>
+      </div>
+    </form>
+
+    <div class="w-full">
+      <button (click)="onStartGame()"
+              [disabled]="form.invalid"
+              [class.opacity-50]="form.invalid"
+              class="bg-primary-default text-off-white text-lg rounded-xl w-full p-4">
+        Start game
+      </button>
+    </div>
+  </div>
+
+</section>
